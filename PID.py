@@ -2,10 +2,11 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-stab = 0.0;
-KP = 0.1;
-KI = 0.3;
-KD = 0.004;
+stab_p = 0.0;
+stab_d = 0.0;
+KP = 0.05;
+KI = 0.2;
+KD = 0.002;
 bias = 0.0;
 noise = False;
 
@@ -21,7 +22,8 @@ else:
 
 yn = input("Would you like to stabilize position (y/N)? ")
 if yn == 'y' or yn == 'Y':
-    stab = 4.0;
+    stab_p = float(input("Position KP = "));
+#     stab_d = float(input("Position KD = "));
 
 yn = input("Would you like to add a systematic error (y/N)? ")
 if yn == 'y' or yn == 'Y':
@@ -61,7 +63,7 @@ arduino_h = 0.01
 arduino_steps = int(arduino_h // h);
 
 # delay between changing motor speed and receiving data
-delay = 0.02
+delay = 0.03
 delay_steps = int(delay // h);
 
 prop_speed = np.zeros(2)
@@ -95,7 +97,7 @@ def prop_acc():
     return pac;
 
 def quad_acc():
-    return (prop_speed[1]**2 - prop_speed[0]**2)*prop_thr_const*arm_length/prop_moment
+    return 2*(prop_speed[1]**2 - prop_speed[0]**2)*prop_thr_const*arm_length/prop_moment
 
 def physics_step(i):
     global quad_speed
@@ -159,8 +161,8 @@ def error(i):
     qspeed = quad_speed;
     if noise: qspeed += np.random.normal(0.0, 0.001);
     err = 0.0;
-    if stab != 0:
-        err = qspeed - stab*(setpoint(i) - quad_position);
+    if stab_p != 0:
+        err = qspeed - stab_p*(setpoint(i) - quad_position) + stab_d*quad_speed;
     else:
         err = qspeed - setpoint(i);
     k = i - arduino_steps
@@ -189,10 +191,10 @@ for i in range(0, steps):
 
 _, plots = plt.subplots(2, sharex = True)
 plots[0].plot(h*np.arange(0, steps), quad_speed_log);
-if stab == 0:
+if stab_p == 0:
     plots[0].plot(h*np.arange(0, steps), setpoint_log);
 
 plots[1].plot(h*np.arange(0, steps), quad_position_log);
-if stab != 0:
+if stab_p != 0:
     plots[1].plot(h*np.arange(0, steps), setpoint_log);
 plt.show();
