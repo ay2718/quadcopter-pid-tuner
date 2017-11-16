@@ -10,20 +10,12 @@ KD = 0.002;
 bias = 0.0;
 noise = False;
 
-yn = input("Would you like to use default values (Y/n)? ")
-if yn == 'n' or yn == 'N':
-    KP = float(input("KP = "));
-    KI = float(input("KI = "));
-    KD = float(input("KD = "));
-else:
-    print("KP =", KP);
-    print("KI =", KI);
-    print("KD =", KD);
-
-yn = input("Would you like to stabilize position (y/N)? ")
-if yn == 'y' or yn == 'Y':
-    stab_p = float(input("Position KP = "));
-#     stab_d = float(input("Position KD = "));
+try: KP = float(input("KP = (default is "+str(KP)+") "));
+except: pass
+try: KI = float(input("KP = (default is "+str(KI)+") "));
+except: pass
+try: KD = float(input("KP = (default is "+str(KD)+") "));
+except: pass
 
 yn = input("Would you like to add a systematic error (y/N)? ")
 if yn == 'y' or yn == 'Y':
@@ -32,6 +24,9 @@ if yn == 'y' or yn == 'Y':
 yn = input("Would you like to add random noise (y/N)? ")
 if yn == 'y' or yn == 'N':
     noise = True;
+
+try: stab_p = float(input("Position stabilization P coefficient (default is 0) "));
+except: pass
 
 base_thrust = 0.5;
 
@@ -190,6 +185,8 @@ for i in range(0, steps):
         prop_voltage = thrust_to_voltage();
 
 _, plots = plt.subplots(2, sharex = True)
+plots[0].set_title("Quadcopter Angular Velocity vs Time");
+plots[1].set_title("Quadcopter Angular Position vs Time");
 plots[0].plot(h*np.arange(0, steps), quad_speed_log);
 if stab_p == 0:
     plots[0].plot(h*np.arange(0, steps), setpoint_log);
