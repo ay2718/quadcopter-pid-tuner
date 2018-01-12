@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 yn = "Y"
 plt.ion();
 fig = plt.figure();
+plt.ioff();
  
 while yn != "n" and yn != "N":
 
@@ -128,6 +129,7 @@ while yn != "n" and yn != "N":
             motor_voltage = trim(motor_voltage);
     
     yn = input("Clear previous plots (Y/n) ");
+    plt.ion()
     if yn != "n" and yn != "N":
         plt.clf();
         plt.plot(h*np.arange(0, steps), setpoint_log, color = "k", linewidth=2);
@@ -135,5 +137,6 @@ while yn != "n" and yn != "N":
     fig.suptitle("KP = "+str(KP)+" V/(rad),    KI = "+str(KI)+" V/(rad*s),    KD = "+str(KD)+" V/(rad/s),    Arm Mass = "+str(arm_assym_mass)+" kg", fontsize = 20)
     plt.plot(h*np.arange(0, steps), motor_position_log);
     plt.show();
+    plt.ioff()
 
     yn = input("Run again? (Y/n) ");
